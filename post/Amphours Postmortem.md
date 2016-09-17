@@ -168,27 +168,205 @@ Next lets dive into the statistics.
 
 Who has the most battery life?
 
+First, lets find out how much "fluff" data we have. We can do that by removing all of the 0-used elements, which yield completely absurd predictions.  
+
 
 ```python
-# Lets find the total first 
-sorted_statistics_total = sorted(statistics, key=lambda stat: stat['total'])
+zero_values = filter(lambda stat: stat['used'] == 0, statistics)
 
-pprint(sorted_statistics_total[:1])
-
-
-
+print "Number of stats", len(statistics)
+print "Number of zeros", len(zero_values)
+print "Number of non-zeroes", len(statistics) - len(zero_values)
 ```
 
-    [{u'_id': {u'$oid': u'56192caa4eaa1c0dbed8c144'},
-      u'date': {u'$numberLong': u'1444490308'},
-      u'device': u'samsung SAMSUNG-SM-N910A',
-      u'friendlyname': u'Samsung Galaxy Note4',
-      u'sot': {u'$numberLong': u'-429355737'},
-      u'total': {u'$numberLong': u'-428735446'},
-      u'used': 9,
-      u'uuid': u'de702b52-b09a-407e-bba1-c79535f8dbe0',
-      u'version': 21}]
+    Number of stats 54881
+    Number of zeros 41175
+    Number of non-zeroes 13706
     
+
+Lets filter these further to get where all have at least 20% battery used, which is the threshold used in the ranking process. 
+
+
+
+```python
+THRESHOLD = 20
+
+thresholded_values = filter(lambda stat: stat['used'] > THRESHOLD, statistics)
+
+print "Tresholded values", len(thresholded_values)
+```
+
+    Tresholded values 7211
+    
+
+Now we have 7211 statistics to work with. 
+
+
+```python
+import datetime
+
+# Lets find the total first 
+sorted_statistics_total = sorted(thresholded_values, key=lambda stat: int(stat['total']['$numberLong']))
+sorted_statistics_sot = sorted(thresholded_values, key=lambda stat: int(stat['sot']['$numberLong']))
+
+total_time = int(sorted_statistics_total[-1]['total']['$numberLong'])
+sot_time = int(sorted_statistics_sot[-1]['sot']['$numberLong'])
+
+print str(datetime.timedelta(milliseconds=total_time))
+print str(datetime.timedelta(milliseconds=sot_time))
+```
+
+    40 days, 0:30:03.049000
+    40 days, 0:11:22.334000
+    
+
+There are some clear outliers here - the highest value lasts *16718 days*. 
+
+However, if we slide a few spaces down, we get more reasonable high bar. 
+
+
+
+
+
+
+```python
+device_150 = sorted_statistics_total[-150]
+
+total_time = int(device_150['total']['$numberLong'])
+sot_time = int(device_150['sot']['$numberLong'])
+
+print device_150['friendlyname']
+print str(datetime.timedelta(milliseconds=total_time))
+print str(datetime.timedelta(milliseconds=sot_time))
+```
+
+    HTC One (M8)
+    1 day, 2:50:17.299000
+    1:55:00.848000
+    
+
+Yeah, that's better and aligns with my own use of the N5.  
+
+Now lets apply some outlier detection to this set of data. 
+
+
+
+```python
+%matplotlib inline
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd 
+import matplotlib.font_manager
+from sklearn import svm
+
+xx, yy = np.meshgrid(np.linspace(-5, 5, 500), np.linspace(-5, 5, 500))
+
+THRESHOLD = 20
+thresholded_values = filter(lambda stat: stat['used'] > THRESHOLD, statistics)
+
+# Shuffle the thresholded data 
+np.random.shuffle(thresholded_values)
+
+# Get training data 
+X = [[
+        int(stat['total']['$numberLong']), 
+        int(stat['sot']['$numberLong']), 
+        int(stat['used'])
+     ] for stat in thresholded_values]
+Y = [stat['uuid'] for stat in thresholded_values]
+
+
+# fit the model
+clf = svm.OneClassSVM(kernel="linear")
+clf.fit(X)
+scores = clf.decision_function(X)
+
+
+results = []
+
+idx = 0
+outliers = 0 
+
+for score in scores:
+    if score < 0: 
+        outliers += 1
+        
+        outlier = thresholded_values[idx]
+        total_time = int(outlier['total']['$numberLong'])
+        sot_time = int(outlier['sot']['$numberLong'])
+        
+        total = str(datetime.timedelta(milliseconds=total_time))
+        sot = str(datetime.timedelta(milliseconds=sot_time))
+        results.append([outlier['uuid'], sot, total,  outlier['used']]); 
+    idx += 1
+
+result_df = pd.DataFrame(results)
+result_df.columns = ['UUID', 'SOT', 'Total', 'Used']
+
+print "Outliers: %d,\t %f of dataset" % (outliers, 1.0 * outliers/len(thresholded_values))
+
+result_df.head()
+```
+
+    Outliers: 3605,	 0.499931 of dataset
+    
+
+
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>UUID</th>
+      <th>SOT</th>
+      <th>Total</th>
+      <th>Used</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>20e6a383-5193-4740-8e7a-d63d6536f31c</td>
+      <td>1:47:07.515000</td>
+      <td>7:09:00.779000</td>
+      <td>50</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>234958b7-ad05-4f31-b288-4c4621708d29</td>
+      <td>0:59:43.030000</td>
+      <td>5:13:24.243000</td>
+      <td>36</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>954a3516-d524-457d-9997-6bf60dd88f47</td>
+      <td>1:37:44.197000</td>
+      <td>8:23:02.389000</td>
+      <td>69</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>ea50222a-5c3c-4dc8-bd4a-8e53d85e3da7</td>
+      <td>0:37:18.002000</td>
+      <td>4:50:35.411000</td>
+      <td>28</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>c1fea4fe-b82e-4a65-92e7-4205a152cb70</td>
+      <td>1:42:29.282000</td>
+      <td>7:13:45.010000</td>
+      <td>49</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 
 ```python
