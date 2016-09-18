@@ -1,7 +1,9 @@
 
+
+
 # An Amphours Postmortem
 
-I helped build the backend for Amphours, the first battery benchmark tailored towards real world use. 
+I built the backend for Amphours, the first battery benchmark tailored towards real world use. 
 
 A few days ago my partner [Ming](https://github.com/ming08108?tab=overview&from=2016-08-01&to=2016-08-31&utf8=%E2%9C%93) finally decided to not renew the .xyz domain (Send all hate mail to him). 
 
@@ -33,6 +35,7 @@ Let's load it up.
 ```python
 import json 
 from pprint import pprint
+import pandas as pd
 
 with open('devices.json') as devices_raw: 
     devices = json.load(devices_raw)
@@ -42,67 +45,191 @@ with open('statistics.json') as statistics_raw:
     
 # Print out the last few
 print "Devices"
-pprint(devices[:3]) 
+dev_df = pd.DataFrame(devices)
+dev_df.head() 
 
-print "Statistics"
-pprint(statistics[:3])
+
 
 ```
 
     Devices
-    [{u'_id': {u'$oid': u'57649f238b09bce65c43c7bb'},
-      u'count': 38,
-      u'friendlyname': u'Asus Nexus 7 (2013)',
-      u'name': u'asus Nexus 7',
-      u'rank': 1,
-      u'sot': {u'$numberLong': u'41976548'},
-      u'standby': {u'$numberLong': u'154386092'},
-      u'uniquedevices': 2},
-     {u'_id': {u'$oid': u'57649f238b09bce65c43c7bc'},
-      u'count': 75,
-      u'friendlyname': u'Motorola Moto X 2013 (Europe)',
-      u'name': u'motorola XT1052',
-      u'rank': 2,
-      u'sot': {u'$numberLong': u'36933090'},
-      u'standby': {u'$numberLong': u'63887738'},
-      u'uniquedevices': 2},
-     {u'_id': {u'$oid': u'57649f238b09bce65c43c7bd'},
-      u'count': 661,
-      u'friendlyname': u'Motorola Moto X Style (Pure Edition)',
-      u'name': u'motorola XT1575',
-      u'rank': 3,
-      u'sot': {u'$numberLong': u'32610548'},
-      u'standby': {u'$numberLong': u'39241215'},
-      u'uniquedevices': 10}]
-    Statistics
-    [{u'_id': {u'$oid': u'55ebccdfb94be457b7f38c2c'},
-      u'date': {u'$numberLong': u'1441516699'},
-      u'device': u'LGE LG-H811',
-      u'friendlyname': u'LGE LG-H811',
-      u'sot': {u'$numberLong': u'284368'},
-      u'total': {u'$numberLong': u'3718542'},
-      u'used': 3,
-      u'uuid': u'bc39765e-005d-4ecc-beb0-8eeb46e5edd5',
-      u'version': 22},
-     {u'_id': {u'$oid': u'55ec6235b94be457b7f38c2d'},
-      u'date': {u'$numberLong': u'1441554929'},
-      u'device': u'LGE LG-H811',
-      u'friendlyname': u'LGE LG-H811',
-      u'sot': {u'$numberLong': u'1832653'},
-      u'total': {u'$numberLong': u'38208845'},
-      u'used': 37,
-      u'uuid': u'bc39765e-005d-4ecc-beb0-8eeb46e5edd5',
-      u'version': 22},
-     {u'_id': {u'$oid': u'55ec77c7b94be457b7f38c2e'},
-      u'date': {u'$numberLong': u'1441560451'},
-      u'device': u'LGE LG-H811',
-      u'friendlyname': u'LGE LG-H811',
-      u'sot': {u'$numberLong': u'197945'},
-      u'total': {u'$numberLong': u'1963997'},
-      u'used': 4,
-      u'uuid': u'bc39765e-005d-4ecc-beb0-8eeb46e5edd5',
-      u'version': 22}]
     
+
+
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>_id</th>
+      <th>count</th>
+      <th>friendlyname</th>
+      <th>name</th>
+      <th>rank</th>
+      <th>sot</th>
+      <th>standby</th>
+      <th>uniquedevices</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>{u'$oid': u'57649f238b09bce65c43c7bb'}</td>
+      <td>38</td>
+      <td>Asus Nexus 7 (2013)</td>
+      <td>asus Nexus 7</td>
+      <td>1</td>
+      <td>{u'$numberLong': u'41976548'}</td>
+      <td>{u'$numberLong': u'154386092'}</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>{u'$oid': u'57649f238b09bce65c43c7bc'}</td>
+      <td>75</td>
+      <td>Motorola Moto X 2013 (Europe)</td>
+      <td>motorola XT1052</td>
+      <td>2</td>
+      <td>{u'$numberLong': u'36933090'}</td>
+      <td>{u'$numberLong': u'63887738'}</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>{u'$oid': u'57649f238b09bce65c43c7bd'}</td>
+      <td>661</td>
+      <td>Motorola Moto X Style (Pure Edition)</td>
+      <td>motorola XT1575</td>
+      <td>3</td>
+      <td>{u'$numberLong': u'32610548'}</td>
+      <td>{u'$numberLong': u'39241215'}</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>{u'$oid': u'57649f238b09bce65c43c7be'}</td>
+      <td>26</td>
+      <td>Motorola Moto X Play (Dual Sim)</td>
+      <td>motorola XT1563</td>
+      <td>4</td>
+      <td>{u'$numberLong': u'28520250'}</td>
+      <td>{u'$numberLong': u'56976157'}</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>{u'$oid': u'57649f238b09bce65c43c7bf'}</td>
+      <td>31</td>
+      <td>htc Nexus 9</td>
+      <td>htc Nexus 9</td>
+      <td>5</td>
+      <td>{u'$numberLong': u'26562915'}</td>
+      <td>{u'$numberLong': u'158680537'}</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+print "Statistics"
+stat_df = pd.DataFrame(statistics)
+stat_df.head() 
+```
+
+    Statistics
+    
+
+
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>_id</th>
+      <th>date</th>
+      <th>device</th>
+      <th>friendlyname</th>
+      <th>sot</th>
+      <th>total</th>
+      <th>used</th>
+      <th>uuid</th>
+      <th>version</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>{u'$oid': u'55ebccdfb94be457b7f38c2c'}</td>
+      <td>{u'$numberLong': u'1441516699'}</td>
+      <td>LGE LG-H811</td>
+      <td>LGE LG-H811</td>
+      <td>{u'$numberLong': u'284368'}</td>
+      <td>{u'$numberLong': u'3718542'}</td>
+      <td>3</td>
+      <td>bc39765e-005d-4ecc-beb0-8eeb46e5edd5</td>
+      <td>22</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>{u'$oid': u'55ec6235b94be457b7f38c2d'}</td>
+      <td>{u'$numberLong': u'1441554929'}</td>
+      <td>LGE LG-H811</td>
+      <td>LGE LG-H811</td>
+      <td>{u'$numberLong': u'1832653'}</td>
+      <td>{u'$numberLong': u'38208845'}</td>
+      <td>37</td>
+      <td>bc39765e-005d-4ecc-beb0-8eeb46e5edd5</td>
+      <td>22</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>{u'$oid': u'55ec77c7b94be457b7f38c2e'}</td>
+      <td>{u'$numberLong': u'1441560451'}</td>
+      <td>LGE LG-H811</td>
+      <td>LGE LG-H811</td>
+      <td>{u'$numberLong': u'197945'}</td>
+      <td>{u'$numberLong': u'1963997'}</td>
+      <td>4</td>
+      <td>bc39765e-005d-4ecc-beb0-8eeb46e5edd5</td>
+      <td>22</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>{u'$oid': u'55ec8426b94be457b7f38c34'}</td>
+      <td>{u'$numberLong': u'1441563617'}</td>
+      <td>LGE LG-H811</td>
+      <td>LGE LG-H811</td>
+      <td>{u'$numberLong': u'245544'}</td>
+      <td>{u'$numberLong': u'2199522'}</td>
+      <td>4</td>
+      <td>bc39765e-005d-4ecc-beb0-8eeb46e5edd5</td>
+      <td>22</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>{u'$oid': u'55ec88f6b94be457b7f38c37'}</td>
+      <td>{u'$numberLong': u'1441564849'}</td>
+      <td>LGE LG-H811</td>
+      <td>LGE LG-H811</td>
+      <td>{u'$numberLong': u'6059'}</td>
+      <td>{u'$numberLong': u'6091'}</td>
+      <td>0</td>
+      <td>bc39765e-005d-4ecc-beb0-8eeb46e5edd5</td>
+      <td>22</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 # Devices
 
@@ -152,7 +279,7 @@ show()
 ```
 
 
-![png](output_7_0.png)
+![png](output_8_0.png)
 
 
 
@@ -245,71 +372,80 @@ print str(datetime.timedelta(milliseconds=sot_time))
     1:55:00.848000
     
 
-Yeah, that's better and aligns with my own use of the N5.  
+Yeah, that's better and aligns with my own use.
 
 Now lets apply some outlier detection to this set of data. 
 
 
 
 ```python
-%matplotlib inline
-
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd 
-import matplotlib.font_manager
 from sklearn import svm
 
-xx, yy = np.meshgrid(np.linspace(-5, 5, 500), np.linspace(-5, 5, 500))
+def get_outliers(values): 
+    # Shuffle the thresholded data 
+    np.random.shuffle(values)
 
+    # Get training data 
+    X = [[
+            int(stat['total']['$numberLong']), 
+            int(stat['sot']['$numberLong']), 
+            int(stat['used'])
+         ] for stat in values]
+    Y = [stat['uuid'] for stat in values]
+
+
+    # fit the model
+    guesstimate = 0.1 # Lets estimate 10% novelty rate
+
+    clf = svm.OneClassSVM(kernel="linear", nu=guesstimate)
+    clf.fit(X)
+    scores = clf.decision_function(X)    
+    probs = clf.predict(X)
+    
+    
+    
+    results = []
+    
+    
+    idx = 0
+    outliers = 0 
+
+    for score in scores:        
+        if score < 0: 
+            outliers += 1
+
+            outlier = values[idx]
+            total_time = int(outlier['total']['$numberLong'])
+            sot_time = int(outlier['sot']['$numberLong'])
+
+            total = str(datetime.timedelta(milliseconds=total_time))
+            sot = str(datetime.timedelta(milliseconds=sot_time))
+            results.append([outlier['uuid'], outlier['friendlyname'], sot, total,  outlier['used']]); 
+        idx += 1
+    return results
+```
+
+For this, lets use a OneClassSVM for anomaly/novelty detection. 
+
+
+
+```python
 THRESHOLD = 20
 thresholded_values = filter(lambda stat: stat['used'] > THRESHOLD, statistics)
 
-# Shuffle the thresholded data 
-np.random.shuffle(thresholded_values)
-
-# Get training data 
-X = [[
-        int(stat['total']['$numberLong']), 
-        int(stat['sot']['$numberLong']), 
-        int(stat['used'])
-     ] for stat in thresholded_values]
-Y = [stat['uuid'] for stat in thresholded_values]
-
-
-# fit the model
-clf = svm.OneClassSVM(kernel="linear")
-clf.fit(X)
-scores = clf.decision_function(X)
-
-
-results = []
-
-idx = 0
-outliers = 0 
-
-for score in scores:
-    if score < 0: 
-        outliers += 1
-        
-        outlier = thresholded_values[idx]
-        total_time = int(outlier['total']['$numberLong'])
-        sot_time = int(outlier['sot']['$numberLong'])
-        
-        total = str(datetime.timedelta(milliseconds=total_time))
-        sot = str(datetime.timedelta(milliseconds=sot_time))
-        results.append([outlier['uuid'], sot, total,  outlier['used']]); 
-    idx += 1
+results = get_outliers(thresholded_values)
 
 result_df = pd.DataFrame(results)
-result_df.columns = ['UUID', 'SOT', 'Total', 'Used']
+result_df.columns = ['UUID', 'Device', 'SOT', 'Total', 'Used']
 
-print "Outliers: %d,\t %f of dataset" % (outliers, 1.0 * outliers/len(thresholded_values))
+print "Outliers: %d,\t %f of dataset" % (len(results), 1.0 * outliers/len(thresholded_values))
 
 result_df.head()
 ```
 
-    Outliers: 3605,	 0.499931 of dataset
+    Outliers: 722,	 0.100125 of dataset
     
 
 
@@ -321,6 +457,7 @@ result_df.head()
     <tr style="text-align: right;">
       <th></th>
       <th>UUID</th>
+      <th>Device</th>
       <th>SOT</th>
       <th>Total</th>
       <th>Used</th>
@@ -329,38 +466,43 @@ result_df.head()
   <tbody>
     <tr>
       <th>0</th>
-      <td>20e6a383-5193-4740-8e7a-d63d6536f31c</td>
-      <td>1:47:07.515000</td>
-      <td>7:09:00.779000</td>
-      <td>50</td>
+      <td>98a358ea-174a-46bb-ae64-371f8da32711</td>
+      <td>LGE LG G3</td>
+      <td>0:35:59.440000</td>
+      <td>1:16:30.922000</td>
+      <td>21</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>234958b7-ad05-4f31-b288-4c4621708d29</td>
-      <td>0:59:43.030000</td>
-      <td>5:13:24.243000</td>
-      <td>36</td>
+      <td>de702b52-b09a-407e-bba1-c79535f8dbe0</td>
+      <td>Samsung Galaxy Note4</td>
+      <td>0:51:15.342000</td>
+      <td>1:03:00.743000</td>
+      <td>23</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>954a3516-d524-457d-9997-6bf60dd88f47</td>
-      <td>1:37:44.197000</td>
-      <td>8:23:02.389000</td>
-      <td>69</td>
+      <td>d8864b30-1760-4d0a-9176-ad0eaf9af242</td>
+      <td>LGE LGLS991</td>
+      <td>1:35:26.451000</td>
+      <td>1:59:26.728000</td>
+      <td>49</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>ea50222a-5c3c-4dc8-bd4a-8e53d85e3da7</td>
-      <td>0:37:18.002000</td>
-      <td>4:50:35.411000</td>
-      <td>28</td>
+      <td>62b7e82d-ea57-4b93-b085-b7fea19ae1a3</td>
+      <td>LGE Nexus 5X</td>
+      <td>0:13:12.085000</td>
+      <td>1:35:05.322000</td>
+      <td>22</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>c1fea4fe-b82e-4a65-92e7-4205a152cb70</td>
-      <td>1:42:29.282000</td>
-      <td>7:13:45.010000</td>
-      <td>49</td>
+      <td>7b188bcf-9b53-464f-9804-b4c169aeaa6c</td>
+      <td>Motorola DROID Turbo</td>
+      <td>1:32:09.439000</td>
+      <td>2:13:42.607000</td>
+      <td>29</td>
     </tr>
   </tbody>
 </table>
@@ -368,7 +510,104 @@ result_df.head()
 
 
 
+Our guesstimate is critical to getting good results here - by estimating 10% error with the SVM nu parameter, we get a few anomalous results. 
+
+One can be seen here immediately - ~1hr of SOT and total use implies a 0 hour standby time, which is certainly strange. The same pattern can be observed throughout the list. 
+
+
+Next, lets see if we can find similar anomalies in the data for another device - say, the OnePlusOne. 
+
+
 
 ```python
+opo_stats = [value for value in thresholded_values if value['friendlyname'] == 'OnePlus One']
 
+
+opo_results = get_outliers(opo_stats)
+
+opo_results_df = pd.DataFrame(opo_results)
+opo_results_df.columns = ['UUID', 'Device', 'SOT', 'Total', 'Used']
+
+print "Outliers: %d,\t %f of dataset" % (len(opo_results), 1.0 * len(opo_results)/len(opo_stats))
+
+opo_results_df.head()
 ```
+
+    Outliers: 69,	 0.101471 of dataset
+    
+
+
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>UUID</th>
+      <th>Device</th>
+      <th>SOT</th>
+      <th>Total</th>
+      <th>Used</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>62d5676e-9d5b-4c62-a8ac-de159081f8eb</td>
+      <td>OnePlus One</td>
+      <td>0:57:40.132000</td>
+      <td>2:32:52.711000</td>
+      <td>48</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>7fa7d5f0-20c8-43c2-87eb-ec03bc5cd3f7</td>
+      <td>OnePlus One</td>
+      <td>1:01:16.322000</td>
+      <td>2:22:51.126000</td>
+      <td>25</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2a329c69-95d3-441b-a3f3-784fdd1c54d1</td>
+      <td>OnePlus One</td>
+      <td>1:04:36.553000</td>
+      <td>1:45:30.581000</td>
+      <td>21</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>a385ed28-a74b-47b4-b20c-2dd79aa45beb</td>
+      <td>OnePlus One</td>
+      <td>0:49:37.951000</td>
+      <td>3:03:01.601000</td>
+      <td>36</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>62d5676e-9d5b-4c62-a8ac-de159081f8eb</td>
+      <td>OnePlus One</td>
+      <td>0:42:54.190000</td>
+      <td>2:40:00.325000</td>
+      <td>32</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+Same principle appears to apply - most novel data has the characteristic of having very high ratio of SOT to total use *and* have low total use as well. 
+
+This could be dependent on user preferences, or it could be the result of user applications (like Greenify) that may interfere with receiving screen-off broadcasts. 
+
+# Wrapping Up
+
+
+We can probably glean even more from the data in the future - stay tuned for updates. 
+
+The notebook source can be found [here](https://github.com/akhilcacharya/amphours-postmortem) and the hosted notebook on GitHub [here](https://github.com/akhilcacharya/amphours-postmortem/blob/master/Amphours%20Postmortem.ipynb) 
+
+
+![alt text](phone_amphours_rip.png "RIP")
