@@ -1,4 +1,9 @@
-
+---
+layout: post
+title:  "Analyzing some batteries - an Amphours Postmortem"
+date:   2016-09-18 18:33:53
+categories: projects
+---
 
 
 # An Amphours Postmortem
